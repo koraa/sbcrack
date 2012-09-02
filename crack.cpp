@@ -1,4 +1,4 @@
-#include "cube.h"
+#include "crypto.cpp"
 #include <stdio.h>
 //#include <time.h>
 #include <sys/time.h>
@@ -25,7 +25,27 @@ tfloat nanotime() {
 }
 
 //////////////////////////////////////////
-// KEYS
+// CRYPTO
+
+void c_genprivkey(const char *seed, vector<char> &privstr, vector<char> &pubstr) {
+    tiger::hashval hash;
+    tiger::hash((const uchar *)seed, (int)strlen(seed), hash);
+    bigint<8*sizeof(hash.bytes)/BI_DIGIT_BITS> privkey;
+    memcpy(privkey.digits, hash.bytes, sizeof(privkey.digits));
+    privkey.len = 8*sizeof(hash.bytes)/BI_DIGIT_BITS;
+    privkey.shrink();
+    privkey.printdigits(privstr);
+    privstr.add('\0');
+
+    ecjacobian c(ecjacobian::base);
+    c.mul(privkey);
+    c.normalize();
+    c.print(pubstr);
+    pubstr.add('\0');
+}
+
+//////////////////////////////////////////
+// CRACK
 
 void genauthkey(const char *secret) {
     if(!secret[0]) { 
@@ -34,7 +54,7 @@ void genauthkey(const char *secret) {
     }
     
     vector<char> privkey, pubkey;
-    genprivkey(secret, privkey, pubkey);
+    c_genprivkey(secret, privkey, pubkey);
     
     //printf("private key: %s\n", privkey.getbuf());
     //printf("public key: %s\n", pubkey.getbuf());

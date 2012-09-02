@@ -10,7 +10,7 @@ OPTS = -Wall -Ofast -fmodulo-sched -funsafe-loop-optimizations
 
 
 build:
-	gcc crack.cpp cube/crypto.cpp cube/geom.cpp -I. -Icube -lstdc++ -lrt -o sbcrack $(OPTS)
+	gcc crack.cpp cube/geom.cpp -I. -Icube -lstdc++ -lrt -o sbcrack $(OPTS)
 clean:
 	rm sbcrack
 	find . -name "*.o" | xargs rm
