@@ -1,9 +1,31 @@
 #include "cube.h"
 #include <stdio.h>
-#include <time.h>
-//#include <sys/time.h>
+//#include <time.h>
+#include <sys/time.h>
+
+/////////////////////////////////////////
+// EXTERN
 
 extern void genprivkey(const char *seed, vector<char> &privstr, vector<char> &pubstr);
+
+//////////////////////////////////////////
+// UTIL
+
+#define milli(x)      (x / 1000)
+#define micro(x) milli(x / 1000)
+#define nano(x)  micro(x / 1000)
+
+typedef long double tfloat;
+#define tfloat(x) ((tfloat)x)
+
+tfloat nanotime() {
+    timespec t;
+    clock_gettime(CLOCK_REALTIME, &t);
+    return tfloat(t.tv_sec) + nano(tfloat(t.tv_nsec));
+}
+
+//////////////////////////////////////////
+// KEYS
 
 void genauthkey(const char *secret) {
     if(!secret[0]) { 
@@ -18,22 +40,21 @@ void genauthkey(const char *secret) {
     //printf("public key: %s\n", pubkey.getbuf());
 }
 
-double measure(int times, const char* pass) {
-    int t0, t1;
-    t0 = clock();
+tfloat measure(int times, const char* pass) {
+    tfloat t0, t1;
 
+    t0 = nanotime();    
     for (int i = 0; i < times; i++)
         genauthkey(pass); 
+    t1 = nanotime();
 
-    t1 = clock();
-
-    return ((float)(t1-t0))/CLOCKS_PER_SEC;
+    return t1 - t0;
 }
 
 int main(const int argc, const char** argv){ 
     const char* pass = argv[0];
     int  times = atoi(argv[1]);
 
-    printf("Seconds needed to generate %i: %.3f\n", times, measure(times, pass));
+    printf("Seconds needed to generate %i: %Lf\n", times, measure(times, pass));
     return 0;
 }
