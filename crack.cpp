@@ -56,8 +56,8 @@ void genauthkey(const char *secret) {
     vector<char> privkey, pubkey;
     c_genprivkey(secret, privkey, pubkey);
     
-    //printf("private key: %s\n", privkey.getbuf());
-    //printf("public key: %s\n", pubkey.getbuf());
+    printf("private key: %s\n", privkey.getbuf());
+    printf("public key: %s\n", pubkey.getbuf());
 }
 
 tfloat measure(int times, const char* pass) {
@@ -72,9 +72,12 @@ tfloat measure(int times, const char* pass) {
 }
 
 int main(const int argc, const char** argv){ 
-    const char* pass = argv[0];
-    int  times = atoi(argv[1]);
+    const char* pass = argv[1];
+    int  times = 1;
+    if (argc > 1)
+      times = atoi(argv[2]);
 
-    printf("Seconds needed to generate %i: %Lf\n", times, measure(times, pass));
+    genauthkey(pass);
+    //printf("Seconds needed to generate %i: %Lf\n", times, measure(times, pass));
     return 0;
 }
